@@ -204,7 +204,7 @@
                         isCurrentUserManager
                       "
                       :is-editable="
-                        user.id === comment.person?.id || isCurrentUserAdmin
+                        user.id === comment.person?.id || isCurrentUserManager
                       "
                       :is-pinnable="
                         isDepartmentSupervisor || isCurrentUserManager
@@ -522,7 +522,6 @@ export default {
       'getTaskComments',
       'getTaskPreviews',
       'getTaskStatusForCurrentUser',
-      'isCurrentUserAdmin',
       'isCurrentUserArtist',
       'isCurrentUserClient',
       'isCurrentUserManager',
@@ -941,14 +940,15 @@ export default {
 
     createExtraPreview(forms) {
       this.selectFile(forms)
-
-      const index = this.currentPreviewIndex
       this.errors.addExtraPreview = false
       this.loading.addExtraPreview = true
+      const comment = this.taskComments.find(comment =>
+        comment.previews.find(preview => preview.id === this.currentPreviewId)
+      )
       this.addCommentExtraPreview({
         taskId: this.task.id,
-        commentId: this.taskComments[0].id,
-        previewId: this.taskPreviews[index].id
+        commentId: comment?.id,
+        previewId: this.currentPreviewId
       })
         .then(() => {
           this.loading.addExtraPreview = false
