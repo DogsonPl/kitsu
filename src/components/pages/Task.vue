@@ -237,7 +237,7 @@
                       isCurrentUserManager
                     "
                     :is-editable="
-                      user.id === comment.person?.id || isCurrentUserAdmin
+                      user.id === comment.person?.id || isCurrentUserManager
                     "
                     :is-pinnable="
                       isDepartmentSupervisor || isCurrentUserManager
@@ -416,7 +416,6 @@ export default {
         addPreview: false,
         addExtraPreview: false,
         deleteExtraPreview: false,
-        deleteTask: false,
         deleteComment: false,
         editComment: false
       },
@@ -425,7 +424,6 @@ export default {
         addPreview: false,
         addExtraPreview: false,
         setPreview: false,
-        deleteTask: false,
         deleteComment: false,
         editComment: false
       },
@@ -435,7 +433,6 @@ export default {
         addPreview: false,
         addExtraPreview: false,
         setPreview: false,
-        deleteTask: false,
         deleteComment: false,
         editComment: false
       },
@@ -474,7 +471,6 @@ export default {
       'getTaskComments',
       'getTaskPreviews',
       'getTaskComment',
-      'isCurrentUserAdmin',
       'isCurrentUserArtist',
       'isCurrentUserClient',
       'isCurrentUserManager',
@@ -980,18 +976,15 @@ export default {
 
     createExtraPreview(forms) {
       this.selectFile(forms)
-
-      const previews = this.taskPreviews
-      const preview = previews.length > 0 ? previews[0] : null
       this.errors.addExtraPreview = false
       this.loading.addExtraPreview = true
-      const comment = this.getCurrentTaskComments().find(comment => {
-        return comment.previews.findIndex(p => p.id === preview.id) >= 0
-      })
+      const comment = this.getCurrentTaskComments().find(comment =>
+        comment.previews.find(preview => preview.id === this.currentPreviewId)
+      )
       this.addCommentExtraPreview({
         taskId: this.task.id,
-        previewId: this.currentPreview.id,
-        commentId: comment.id
+        commentId: comment?.id,
+        previewId: this.currentPreviewId
       })
         .then(() => {
           this.loading.addExtraPreview = false
