@@ -402,6 +402,11 @@ export default {
   },
 
   mounted() {
+    if (this.isCurrentUserClient) {
+      this.$router.push({ name: 'not-found' })
+      return
+    }
+
     let searchQuery = ''
     if (this.assetSearchText.length > 0) {
       this.$refs['asset-search-field']?.setValue(this.assetSearchText)

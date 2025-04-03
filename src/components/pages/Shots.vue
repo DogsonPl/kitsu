@@ -451,6 +451,11 @@ export default {
   },
 
   mounted() {
+    if (this.isCurrentUserClient) {
+      this.$router.push({ name: 'not-found' })
+      return
+    }
+
     const finalize = () => {
       this.$nextTick(() => {
         // Needed to be sure the current production is set

@@ -102,6 +102,11 @@ export default {
   },
 
   mounted() {
+    if (this.isCurrentUserClient) {
+      this.$router.push({ name: 'not-found' })
+      return
+    }
+
     this.setDefaultSearchText()
     this.setDefaultListScrollPosition()
     setTimeout(() => {

@@ -404,10 +404,10 @@ export default {
         this.currentProduction.production_type !== 'assets'
       const isNotOnlyShots = this.currentProduction.production_type !== 'shots'
 
-      if (isNotOnlyShots) {
+      if (!this.isCurrentUserClient &&  isNotOnlyShots) {
         options.push({ label: this.$t('assets.title'), value: 'assets' })
       }
-      if (isNotOnlyAssets) {
+      if (!this.isCurrentUserClient && isNotOnlyAssets) {
         options.push({ label: this.$t('shots.title'), value: 'shots' })
       }
       if (!this.isCurrentUserClient && isNotOnlyAssets) {
@@ -454,7 +454,7 @@ export default {
       }
 
       // Add sequences
-      if (isNotOnlyAssets) {
+      if (!this.isCurrentUserClient && isNotOnlyAssets) {
         options.push({
           label: this.$t('sequences.stats_title'),
           value: 'sequence-stats'
@@ -469,7 +469,7 @@ export default {
       }
 
       // Add asset types stats
-      if (isNotOnlyShots) {
+      if (!this.isCurrentUserClient && isNotOnlyShots) {
         options = options.concat([
           {
             label: this.$t('asset_types.production_title'),
