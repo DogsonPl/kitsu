@@ -487,6 +487,9 @@ export default {
         if (isNotOnlyAssets) {
           options.push({ label: this.$t('quota.title'), value: 'quota' })
         }
+        if (this.isCurrentUserAdmin) {
+          options.push({ label: this.$t('budget.title'), value: 'budget' })
+        }
         options.push({ label: this.$t('people.team'), value: 'team' })
 
         if (this.isCurrentUserManager) {
@@ -618,8 +621,19 @@ export default {
         this.loadEpisodes()
           .then(episodes => {
             const query = this.$route.query
+            this.currentProjectSection = this.getCurrentSectionFromRoute()
             if (this.currentProjectSection === 'assets') {
               this.currentEpisodeId = 'all'
+            } else if (
+              this.currentProjectSection === 'playlists' &&
+              routeEpisodeId === 'all'
+            ) {
+              this.currentEpisodeId = 'all'
+            } else if (
+              this.currentProjectSection === 'playlists' &&
+              routeEpisodeId === 'main'
+            ) {
+              this.currentEpisodeId = 'main'
             } else {
               let episode = episodes.find(({ id }) => id === routeEpisodeId)
               if (!episode) {
@@ -751,6 +765,7 @@ export default {
         section !== 'schedule' &&
         section !== 'production-settings' &&
         section !== 'brief' &&
+        section !== 'budget' &&
         section !== 'episodes'
       if (isEpisodeContext) {
         route.name = `episode-${section}`
