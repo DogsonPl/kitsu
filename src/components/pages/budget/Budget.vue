@@ -8,20 +8,31 @@
           :budget="currentBudget"
           :is-loading="loading.budgets"
           :is-error="errors.budgets"
+          :is-error-expenses="errors.expenses"
+          :is-loading-expenses="loading.expenses"
+          :is-showing-expenses="expenses.showing"
           @change-budget="onChangeBudget"
-          @edit-budget="onEditBudgetClicked"
           @delete-budget="onDeleteBudgetClicked"
+          @edit-budget="onEditBudgetClicked"
+          @export-budget="onExportBudgetClicked"
+          @toggle-expenses="onToggleExpenses"
           @new-version="onNewBudgetVersionClicked"
         />
 
         <budget-list
-          :budget="currentBudget"
           :budget-departments="budgetDepartments"
           :budget-entries="budgetEntries"
+          :costs-months="costsMonths"
           :currency="currentBudget?.currency || 'USD'"
-          :is-loading="loading.entries"
+          :current-budget="currentBudget"
+          :expenses="expenses.data"
           :is-error="errors.entries"
+          :is-loading="loading.entries"
+          :is-showing-expenses="expenses.showing"
+          :months-between-start-and-now="monthsBetweenStartAndNow"
+          :months-between-now-and-end="monthsBetweenNowAndEnd"
           :months-between-production-dates="monthsBetweenProductionDates"
+          :salary-scale="salaryScale"
           :total-entry="totalEntry"
           @add-budget-entry="onAddBudgetEntry"
           @delete-budget-entry="deleteBudgetEntry"
@@ -42,9 +53,9 @@
         <edit-budget-entry-modal
           :active="modals.createBudgetEntry"
           :budget-entry-to-edit="budgetEntryToEdit"
-          :salary-scale="salaryScale"
           :is-loading="loading.createBudgetEntry"
           :is-error="errors.createBudgetEntry || errors.editBudgetEntry"
+          :salary-scale="salaryScale"
           @cancel="modals.createBudgetEntry = false"
           @confirm="confirmCreateBudgetEntry"
         />
@@ -94,6 +105,7 @@ import moment from 'moment'
 
 import { pageMixin } from '@/components/mixins/page'
 import { formatMonth, parseSimpleDate } from '@/lib/time'
+import csv from '@/lib/csv'
 
 import BudgetAnalytics from '@/components/pages/budget/BudgetAnalytics.vue'
 import BudgetHeader from '@/components/pages/budget/BudgetHeader.vue'
@@ -142,24 +154,31 @@ export default {
       budgetEntryToEdit: {},
       budgetOptions: [],
       budgetToEdit: {},
+      costsMonths: [],
       currentBudget: {},
       errors: {
         budgets: false,
         createBudget: false,
+        deleteBudget: false,
+        deleteBudgetEntry: false,
         editBudget: false,
         editBudgetEntry: false,
         entries: false,
-        deleteBudget: false,
-        deleteBudgetEntry: false
+        expenses: false
+      },
+      expenses: {
+        data: {},
+        showing: false
       },
       loading: {
         budgets: true,
         createBudget: false,
+        deleteBudget: false,
+        deleteBudgetEntry: false,
         editBudget: false,
         editBudgetEntry: false,
         entries: true,
-        deleteBudget: false,
-        deleteBudgetEntry: false
+        expenses: false
       },
       modals: {
         createBudget: false,
@@ -178,10 +197,7 @@ export default {
     await this.setSalaryScale()
     await this.loadBudgets()
     await this.loadBudgetEntries()
-    this.monthsBetweenProductionDates = this.getMonthsBetweenDates(
-      this.currentProduction.start_date,
-      this.currentProduction.end_date
-    )
+    this.resetMonths()
   },
 
   computed: {
@@ -191,6 +207,20 @@ export default {
       'departmentMap',
       'personMap'
     ]),
+
+    monthsBetweenStartAndNow() {
+      return this.getMonthsBetweenDates(
+        this.currentProduction.start_date,
+        moment().format('YYYY-MM-DD')
+      )
+    },
+
+    monthsBetweenNowAndEnd() {
+      return this.getMonthsBetweenDates(
+        moment().add(1, 'month').format('YYYY-MM-DD'),
+        this.currentProduction.end_date
+      )
+    },
 
     lastRevision() {
       return this.budgets.length > 0 ? this.budgets[0].revision : 0
@@ -216,21 +246,29 @@ export default {
         departmentEntries.forEach(entry => {
           const monthlySalary = entry.daily_salary * 20
           const monthCosts = {}
+          let total = 0
+          entry.exceptions = entry.exceptions || {}
           for (let i = 0; i < entry.months_duration; i++) {
             const month = moment(entry.start_date).add(i, 'month')
-            monthCosts[month.format('YYYY-MM')] = monthlySalary
+            const monthKey = month.format('YYYY-MM')
+            const monthCost = entry.exceptions[monthKey] || monthlySalary
+            monthCosts[monthKey] = monthCost
+            total += monthCost
           }
           departmentData.persons.push({
             id: entry.id,
             person_id: entry.person_id,
             budget_entry_id: entry.id,
             department_id: entry.department_id,
-            monthCosts: monthCosts,
+            monthCosts,
             position: entry.position,
             seniority: entry.seniority,
-            total: entry.months_duration * monthlySalary,
+            total,
             months_duration: entry.months_duration,
-            start_date: entry.start_date
+            monthly_salary: monthlySalary,
+            daily_salary: entry.daily_salary,
+            start_date: entry.start_date,
+            exceptions: entry.exceptions
           })
           const startDate = moment(entry.start_date)
           const departmentStartDate = moment(departmentData.start_date)
@@ -246,13 +284,9 @@ export default {
         budgetDepartments.push(departmentData)
       })
       budgetDepartments.sort((a, b) => {
-        if (a.start_date === b.start_date) {
-          const departmentA = this.departmentMap.get(a.id)
-          const departmentB = this.departmentMap.get(b.id)
-          return departmentA.name.localeCompare(departmentB.name)
-        } else {
-          return moment(a.start_date).isBefore(b.start_date) ? -1 : 1
-        }
+        const departmentA = this.departmentMap.get(a.id)
+        const departmentB = this.departmentMap.get(b.id)
+        return departmentA.name.localeCompare(departmentB.name)
       })
       return budgetDepartments
     },
@@ -270,7 +304,7 @@ export default {
       }, {})
       return {
         total,
-        monthCosts: monthCosts
+        monthCosts
       }
     },
 
@@ -304,6 +338,7 @@ export default {
       'createProductionBudget',
       'deleteProductionBudget',
       'deleteProductionBudgetEntry',
+      'loadExpenses',
       'loadProductionBudget',
       'loadProductionBudgets',
       'loadProductionBudgetEntry',
@@ -315,6 +350,16 @@ export default {
 
     formatMonth,
 
+    resetMonths() {
+      this.monthsBetweenProductionDates = this.getMonthsBetweenDates(
+        this.currentProduction.start_date,
+        this.currentProduction.end_date
+      )
+      this.costsMonths = this.monthsBetweenProductionDates.map(month => {
+        return month.format('YYYY-MM')
+      })
+    },
+
     sortDepartmentPersons(a, b) {
       const seniorityWeight = {
         junior: 1,
@@ -323,8 +368,8 @@ export default {
       }
       const positionWeight = {
         artist: 1,
-        supervisor: 2,
-        lead: 3
+        lead: 2,
+        supervisor: 3
       }
       const seniorityA = seniorityWeight[a.seniority]
       const seniorityB = seniorityWeight[b.seniority]
@@ -366,6 +411,26 @@ export default {
     onEditBudgetClicked() {
       this.budgetToEdit = this.currentBudget
       this.modals.createBudget = true
+    },
+
+    onExportBudgetClicked() {
+      const nameData = [
+        this.$t('budget.title').toLowerCase(),
+        this.currentProduction.name,
+        `v${this.currentBudget.revision}`,
+        this.currentBudget.name,
+        this.currentBudget.currency
+      ]
+      csv.generateBudget(
+        this.$t,
+        this.departmentMap,
+        this.personMap,
+        nameData,
+        this.currentBudget.currency,
+        this.monthsBetweenProductionDates,
+        this.totalEntry,
+        this.budgetDepartments
+      )
     },
 
     onNewBudgetVersionClicked() {
@@ -599,18 +664,35 @@ export default {
       const months = []
       const current = parseSimpleDate(startDate)
       const end = parseSimpleDate(endDate)
-
       while (current <= end) {
-        months.push(moment(current))
+        months.push(current.clone())
         current.add(1, 'month')
       }
       return months
+    },
+
+    async onToggleExpenses() {
+      if (!this.expenses.showing) {
+        try {
+          this.loading.expenses = true
+          this.expenses.data = await this.loadExpenses(
+            this.currentProduction.id
+          )
+        } catch (error) {
+          console.error(error)
+          this.errors.expenses = true
+        } finally {
+          this.loading.expenses = false
+        }
+      }
+      this.expenses.showing = !this.expenses.showing
     }
   },
 
   watch: {
     currentProduction() {
       this.loadBudgets()
+      this.resetMonths()
     },
 
     currentBudget() {
