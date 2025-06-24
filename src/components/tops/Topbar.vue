@@ -198,9 +198,11 @@
         </li>
         <li class="version">Kitsu {{ kitsuVersion }}</li>
         <hr />
-        <li class="flexrow" @click="onLogoutClicked">
-          <log-out-icon class="flexrow-item icon-1x" />
-          <span class="flexrow-item">{{ $t('main.logout') }}</span>
+        <li>
+          <router-link :to="{ name: 'logout' }" class="flexrow">
+            <log-out-icon class="flexrow-item icon-1x" />
+            <span class="flexrow-item">{{ $t('main.logout') }}</span>
+          </router-link>
         </li>
       </ul>
     </nav>
@@ -515,6 +517,11 @@ export default {
           { label: this.$t('sequences.title'), value: 'sequences' }
         ]
 
+        // Show only if there are task types for Edit in this production.
+        if (this.productionEditTaskTypes.length > 0) {
+          options.push({ label: this.$t('edits.title'), value: 'edits' })
+        }
+
         if (this.isTVShow) {
           options.push({ label: this.$t('episodes.title'), value: 'episodes' })
         }
@@ -540,7 +547,6 @@ export default {
       'clearSelectedTasks',
       'loadEpisodes',
       'incrementNotificationCounter',
-      'logout',
       'saveLastProductionRoute',
       'setProduction',
       'setCurrentEpisode',
@@ -549,15 +555,6 @@ export default {
       'toggleSidebar',
       'toggleUserMenu'
     ]),
-
-    onLogoutClicked() {
-      this.logout((err, success) => {
-        this.$socket.disconnect()
-        if (err) console.error(err)
-        this.toggleUserMenu()
-        if (success) this.$router.push('/login')
-      })
-    },
 
     getCurrentSectionFromRoute() {
       if (this.$route.name === 'person') {
@@ -909,7 +906,7 @@ export default {
 }
 
 .user-menu ul a {
-  display: block;
+  display: flex;
   color: #333;
 }
 
