@@ -1154,7 +1154,7 @@ export default {
     },
 
     onSearchTyped() {
-      if (this.shotMap.size < 800) {
+      if (this.shotMap.size < 800 || this.searchField?.getValue() === '') {
         this.onSearchChange()
       }
     }
@@ -1170,7 +1170,7 @@ export default {
         this.$refs['shot-search-field']?.setValue('')
         this.$store.commit('SET_SHOT_LIST_SCROLL_POSITION', 0)
 
-        if (!this.isTVShow) {
+        if (this.currentProduction && !this.isTVShow) {
           this.loadShots()
         }
       }
