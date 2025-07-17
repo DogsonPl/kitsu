@@ -134,7 +134,7 @@ export default {
 
   budget: {
     add_entry: 'Add an entry',
-    analytics: 'Bugdget Analytics',
+    analytics: 'Budget Analytics',
     cash_evolution: 'Expense evolution',
     cash_repartition: 'Expense repartition',
     cost: 'Cost',
@@ -392,6 +392,8 @@ export default {
       without_thumbnail: 'Without thumbnail'
     },
 
+    display_options: 'Display Settings',
+
     logs: {
       no_logs: 'There are no time logs for this entity.'
     },
@@ -492,8 +494,9 @@ export default {
     draw: 'Set draw mode on',
     plhome: 'Go to the first frame',
     plend: 'Go to the last frame',
-    plaltright: 'Go to the first frame of the next shot',
     plaltleft: 'Go to the last frame of the previous shot',
+    plalto: 'Switch between 0% and 100% opacity in comparison mode',
+    plaltright: 'Go to the first frame of the next shot',
     navigation: 'Navigation',
     redo: 'Redo',
     undo: 'Undo',
@@ -609,6 +612,7 @@ export default {
       open_page: 'Open {personName} page',
       unassign: 'Unassign {personName}'
     },
+    back: 'Back',
     before: 'Before',
     cancel: 'Cancel',
     clear_selection: 'Clear current selection',
@@ -1460,15 +1464,16 @@ export default {
       name: 'Name',
       error: 'An error occurred while adding or editing the milestone. Please try again.'
     },
-    detail_level: 'Detail level',
-    detail_level_prev: 'Forecast',
-    detail_level_real: 'Real',
-    revision: 'Revision',
+    mode: 'View Mode',
+    mode_prev: 'Forecast',
+    mode_real: 'Real',
+    version: 'Version',
     apply_to_prod: 'Apply to production',
     assign: 'Assign to:',
     reset_list: 'Reset list',
     no_entity: 'No assignable entity',
     no_assignee: 'No assignable person',
+    select_task_type: 'Select a task type',
     show_assigned: 'Show assigned entities',
     force_unassign: 'Override previous assignments',
     forced_daily_quotas: 'Forced daily quotas:',
@@ -1549,6 +1554,7 @@ export default {
     restore_text: 'Are you sure you want to restore {name} from your archive?',
     restore_error: 'An error occurred while restoring this shot.',
     sequences: 'Sequences',
+    show_timecode: 'Show in and out as timecodes',
     tasks: 'Shot Tasks',
     title: 'Shots',
     wrong_file_duration: 'One of the uploaded video file duration doesn\'t match the expected duration of the current shot.',
@@ -1699,7 +1705,7 @@ export default {
     small_thumbnails: 'Show small thumbnails',
     smaller: 'Reduce task panel',
     select_file: 'Please select the file from your hard drive you want to attach to your comment or message:',
-    show_contact_sheet: 'Display tasks as a contact sheet',
+    show_contact_sheet: 'Display as a contact sheet',
     subscribe_notifications: 'Subscribe to notifications',
     subscribe_to_tasks: 'Subscribe to selected task notifications | Subscribe to the {nbSelectedTasks} selected tasks notifications',
     unsubscribe_notifications: 'Unsubscribe from notifications',

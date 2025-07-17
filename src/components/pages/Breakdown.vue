@@ -28,7 +28,7 @@
             v-if="isAssetCasting"
           />
           <span class="filler"></span>
-          <show-infos-button class="flexrow-item" :is-breakdown="true" />
+          <show-infos-button class="flexrow-item" />
           <button-simple
             class="flexrow-item"
             :title="
@@ -809,8 +809,10 @@ export default {
 
     async reloadEntities() {
       this.isLoading = true
-      await this.loadSequences()
-      await this.loadShots()
+      if (!this.isTVShow || this.currentEpisode?.id !== 'main') {
+        await this.loadSequences()
+        await this.loadShots()
+      }
       if (this.isTVShow) {
         if (this.currentEpisode) {
           this.episodeId = this.currentEpisode.id
@@ -826,7 +828,10 @@ export default {
         this.setCastingAssetTypes()
         if (this.assetTypeId) {
           this.setCastingAssetType(this.assetTypeId)
-        } else {
+        } else if (
+          this.episodeId &&
+          !['main', 'all'].includes(this.episodeId)
+        ) {
           this.setCastingSequence(this.sequenceId || 'all')
         }
         this.resetSequenceOption()
@@ -1591,7 +1596,7 @@ export default {
     episodeId() {
       if (this.episodeId && this.episodes && this.episodes.length > 0) {
         if (this.episodeId === 'all') {
-          this.setCastingForProductionEpisodes(this.episodeId)
+          this.setCastingForProductionEpisodes()
         }
         this.resetSelection()
       }

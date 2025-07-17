@@ -29,6 +29,7 @@ export default defineConfig({
     }
   },
   css: {
+    devSourcemap: true,
     preprocessorOptions: {
       scss: {
         additionalData: `@use "@/variables.scss" as *;`,
@@ -47,6 +48,7 @@ export default defineConfig({
       },
       '/socket.io': {
         target: process.env.KITSU_EVENT_TARGET || 'http://127.0.0.1:5001',
+        changeOrigin: true,
         ws: true
       }
     }
