@@ -68,7 +68,6 @@
                 {{ entry.resolution }}
               </td>
               <row-actions-cell
-                :entry-id="entry.id"
                 @edit-clicked="$emit('edit-clicked', entry)"
                 :hide-delete="true"
               />
@@ -129,7 +128,6 @@
               {{ entry.resolution }}
             </td>
             <row-actions-cell
-              :entry-id="entry.id"
               @edit-clicked="$emit('edit-clicked', entry)"
               @delete-clicked="$emit('delete-clicked', entry)"
             />

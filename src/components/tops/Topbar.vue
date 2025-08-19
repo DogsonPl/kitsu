@@ -33,7 +33,6 @@
             <topbar-production-list
               :episode-id="currentEpisodeId"
               :production-list="openProductions"
-              :production="currentProduction"
               :section="currentSectionOption"
             />
           </div>
@@ -291,6 +290,7 @@ export default {
       'lastProductionRoute',
       'lastProductionViewed',
       'mainConfig',
+      'notifications',
       'openProductions',
       'organisation',
       'productionMap',
@@ -526,13 +526,17 @@ export default {
     ...mapActions([
       'clearEpisodes',
       'clearSelectedTasks',
+      'decrementNotificationCounter',
       'loadEpisodes',
       'incrementNotificationCounter',
+      'markAllNotificationsAsReadLocal',
+      'resetNotificationCounter',
       'saveLastProductionRoute',
       'setProduction',
       'setCurrentEpisode',
       'setSupportChat',
       'toggleDarkTheme',
+      'toggleNotificationReadStatusLocal',
       'toggleSidebar',
       'toggleUserMenu'
     ]),
@@ -804,6 +808,43 @@ export default {
           this.$route.name !== 'notifications'
         ) {
           this.incrementNotificationCounter()
+        }
+      },
+
+      'notification:all-read'(eventData) {
+        if (this.user.id === eventData.person_id) {
+          this.resetNotificationCounter()
+          this.markAllNotificationsAsReadLocal()
+        }
+      },
+
+      'notification:read'(eventData) {
+        if (this.user.id === eventData.person_id) {
+          if (this.$route.name === 'notifications') {
+            const notification = this.notifications.find(
+              notification => notification.id === eventData.notification_id
+            )
+            if (notification && !notification.read) {
+              this.toggleNotificationReadStatusLocal(notification)
+            }
+          } else {
+            this.decrementNotificationCounter()
+          }
+        }
+      },
+
+      'notification:unread'(eventData) {
+        if (this.user.id === eventData.person_id) {
+          if (this.$route.name === 'notifications') {
+            const notification = this.notifications.find(
+              notification => notification.id === eventData.notification_id
+            )
+            if (notification && notification.read) {
+              this.toggleNotificationReadStatusLocal(notification)
+            }
+          } else {
+            this.incrementNotificationCounter()
+          }
         }
       }
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="data-list task-list">
     <div class="datatable-wrapper" ref="body" @scroll.passive="onBodyScroll">
-      <table class="datatable">
+      <table class="datatable" v-if="!isLoading">
         <thead class="datatable-head">
           <tr>
             <th
@@ -303,9 +303,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import { selectionListMixin } from '@/components/mixins/selection'
-import { formatListMixin } from '@/components/mixins/format'
+import { domMixin } from '@/components/mixins/dom'
 import { descriptorMixin } from '@/components/mixins/descriptors'
+import { formatListMixin } from '@/components/mixins/format'
+import { selectionListMixin } from '@/components/mixins/selection'
 
 import { sortPeople } from '@/lib/sorting'
 import {
@@ -333,7 +334,7 @@ import DateField from '@/components/widgets/DateField.vue'
 export default {
   name: 'todos-list',
 
-  mixins: [formatListMixin, selectionListMixin, descriptorMixin],
+  mixins: [domMixin, formatListMixin, selectionListMixin, descriptorMixin],
 
   components: {
     EntityThumbnail,
@@ -394,11 +395,13 @@ export default {
   mounted() {
     this.resizeHeaders()
     window.addEventListener('keydown', this.onKeyDown, false)
-    this.colTypePosX = this.$refs['th-prod'].offsetWidth + 'px'
-    this.colNamePosX =
-      this.$refs['th-prod'].offsetWidth +
-      this.$refs['th-type'].offsetWidth +
-      'px'
+    if (this.$refs['th-prod']) {
+      this.colTypePosX = this.$refs['th-prod'].offsetWidth + 'px'
+      this.colNamePosX =
+        this.$refs['th-prod'].offsetWidth +
+        this.$refs['th-type'].offsetWidth +
+        'px'
+    }
   },
 
   beforeUnmount() {

@@ -479,7 +479,7 @@
 </template>
 <script>
 import { ref } from 'vue'
-import firstBy from 'thenby'
+import { firstBy } from 'thenby'
 import moment from 'moment-timezone'
 import { mapGetters, mapActions } from 'vuex'
 import { PlusIcon, XIcon } from 'lucide-vue-next'
@@ -1007,7 +1007,7 @@ export default {
       this.playlistPlayer.entityList.push(playlistEntity)
       if (scrollRight) {
         this.$nextTick(() => {
-          this.playlistPlayer.scrollToRight()
+          this.playlistPlayer?.scrollToRight()
         })
       }
     },
