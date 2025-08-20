@@ -15,7 +15,7 @@
         </template>
         <img :src="thumbnailPath" v-else />
       </div>
-      <span class="flexrow-item" v-if="!onlyAvatar">
+      <span class="flexrow-item">
         {{ entry.name }}
       </span>
     </router-link>
@@ -30,7 +30,7 @@
         </template>
         <img :src="thumbnailPath" v-else />
       </div>
-      <span class="flexrow-item" v-if="!onlyAvatar">
+      <span class="flexrow-item">
         {{ entry.name }}
       </span>
     </div>

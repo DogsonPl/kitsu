@@ -928,7 +928,6 @@ export default {
 .production {
   width: 70px;
   min-width: 70px;
-  max-width: 70px;
 }
 
 .type {
