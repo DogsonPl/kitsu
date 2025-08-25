@@ -1194,11 +1194,7 @@ export default {
 
     this.resetPencilConfiguration()
 
-    this.$nextTick(() => {
-      if (this.$refs.commentButton?.$el) {
-        this.$refs.commentButton.$el.click();
-      }
-    });
+    this.onCommentClicked();
   },
 
   beforeUnmount() {
