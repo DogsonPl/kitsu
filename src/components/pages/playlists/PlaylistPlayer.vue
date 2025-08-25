@@ -792,6 +792,7 @@
       </div>
       <div class="separator"></div>
       <button-simple
+        ref="commentButton"
         class="button playlist-button flexrow-item"
         :active="!isCommentsHidden"
         :title="$t('playlists.actions.comments')"
@@ -1194,9 +1195,8 @@ export default {
     this.resetPencilConfiguration()
 
     this.$nextTick(() => {
-      const button = this.$el.querySelector('.playlist-button');
-      if (button) {
-        button.click();
+      if (this.$refs.commentButton?.$el) {
+        this.$refs.commentButton.$el.click();
       }
     });
   },
