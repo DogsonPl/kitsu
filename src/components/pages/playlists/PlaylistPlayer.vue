@@ -1192,6 +1192,13 @@ export default {
     this.isMounted = true
 
     this.resetPencilConfiguration()
+
+    this.$nextTick(() => {
+      const button = this.$el.querySelector('.playlist-button');
+      if (button) {
+        button.click();
+      }
+    });
   },
 
   beforeUnmount() {
