@@ -230,7 +230,7 @@ export default {
           !['edits', 'episodes'].includes(routeName) &&
           production.first_episode_id
         ) {
-          route.params.episode_id = production.first_episode_id
+          route.params.episode_id = 'all'  // production.first_episode_id
         } else {
           route.params.episode_id = 'all'
         }

@@ -59,7 +59,7 @@
         <div class="playlists" v-if="!loading.playlists">
           <router-link
             :key="playlist.id"
-            :to="getPlaylistPath(playlist.id)"
+            :to="getPlaylistPath(playlist.id, playlist.episode_id)"
             :class="{
               'playlist-item': true,
               'for-client': playlist.for_client || false,
@@ -141,7 +141,7 @@
           <router-link
             class="recent-playlist flexrow-item flexrow"
             :key="'recent-playlist-' + playlist.id"
-            :to="getPlaylistPath(playlist.id)"
+            :to="getPlaylistPath(playlist.id, playlist.episode_id)"
             v-for="playlist in lastPlaylists"
           >
             <div class="has-text-centered">
@@ -716,10 +716,10 @@ export default {
       return formatDate(dateString)
     },
 
-    getPlaylistPath(playlistId, section) {
+    getPlaylistPath(playlistId, episode_id, section) {
       return getPlaylistPath(
         this.currentProduction.id,
-        this.currentEpisode ? this.currentEpisode.id : null,
+        episode_id,
         playlistId,
         section
       )
@@ -1237,7 +1237,7 @@ export default {
       this.errors.editPlaylist = false
       this.newPlaylist(newPlaylist)
         .then(playlist => {
-          this.$router.push(this.getPlaylistPath(playlist.id))
+          this.$router.push(this.getPlaylistPath(playlist.id, playlist.episode_id))
           this.loading.editPlaylist = false
           this.modals.isEditDisplayed = false
         })
