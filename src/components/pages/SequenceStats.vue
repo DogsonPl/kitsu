@@ -55,7 +55,7 @@
       :is-error="isShotsLoadingError"
       :validation-columns="shotValidationColumns"
       :sequence-stats="sequenceStats"
-      :show-all="sequenceSearchText.length === 0"
+      :show-all="!sequenceSearchText"
       @field-changed="onFieldChanged"
       @scroll="saveScrollPosition"
     />
@@ -134,13 +134,11 @@ export default {
       'currentEpisode',
       'currentProduction',
       'displayedSequences',
-      'isCurrentUserManager',
       'isPaperProduction',
       'isShotsLoading',
       'isShotsLoadingError',
       'isTVShow',
       'searchSequenceFilters',
-      'sequences',
       'sequenceMap',
       'sequencesPath',
       'sequenceStats',
@@ -160,15 +158,12 @@ export default {
   methods: {
     ...mapActions([
       'computeSequenceStats',
-      'hideAssignations',
       'initSequences',
       'loadShots',
       'removeSequenceSearch',
       'saveSequenceSearch',
-      'setLastProductionScreen',
-      'setSequenceStatsSearch',
       'setSequenceListScrollPosition',
-      'showAssignations'
+      'setSequenceStatsSearch'
     ]),
 
     reloadData() {
@@ -180,11 +175,9 @@ export default {
     },
 
     setDefaultListScrollPosition() {
-      if (this.$refs['sequence-list']) {
-        this.$refs['sequence-list'].setScrollPosition(
-          this.sequenceListScrollPosition
-        )
-      }
+      this.$refs['sequence-list']?.setScrollPosition(
+        this.sequenceListScrollPosition
+      )
     },
 
     navigateToList() {
@@ -293,8 +286,8 @@ export default {
       }
     },
 
-    '$route.query.search'() {
-      this.setSearchFromUrl()
+    '$route.query.search'(search) {
+      this.searchField?.setValue(search)
       this.onSearchChange()
     }
   },
