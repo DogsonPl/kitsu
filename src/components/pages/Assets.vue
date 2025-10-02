@@ -333,7 +333,7 @@ export default {
         showInfos: true,
         showSharedAssets: true
       },
-      optionalColumns: ['Description', 'Ready for'],
+      optionalColumns: ['Description', 'Ready for', 'Resolution'],
       pageName: 'Assets',
       parsedCSV: [],
       selectedDepartment: 'ALL',
@@ -392,17 +392,9 @@ export default {
   },
 
   mounted() {
-    if (this.isCurrentUserClient) {
-      this.$router.push({ name: 'not-found' })
-      return
-    }
-
-    let searchQuery = ''
-    if (this.assetSearchText.length > 0) {
+    const searchQuery = this.$route.query.search ?? ''
+    if (this.assetSearchText) {
       this.$refs['asset-search-field']?.setValue(this.assetSearchText)
-    }
-    if (this.$route.query.search && this.$route.query.search.length > 0) {
-      searchQuery = `${this.$route.query.search}`
     }
     this.$refs['asset-list']?.setScrollPosition(this.assetListScrollPosition)
     const finalize = () => {
@@ -469,6 +461,7 @@ export default {
       'isCurrentUserClient',
       'isCurrentUserManager',
       'isTVShow',
+      'isAssetResolution',
       'openProductions',
       'productionAssetTaskTypes',
       'selectedAssets',
@@ -577,6 +570,18 @@ export default {
       'uploadAssetFile'
     ]),
 
+    setOptionalImportColumns() {
+      const columns = [
+        this.$t('assets.fields.description'),
+        this.$t('assets.fields.ready_for'),
+        this.$t('shots.fields.resolution')
+      ]
+      if (this.isPaperProduction) {
+        columns.splice(1, 1)
+      }
+      this.optionalColumns = columns
+    },
+
     showNewModal() {
       this.assetToEdit = {}
       this.modals.isNewDisplayed = true
@@ -629,7 +634,7 @@ export default {
         .then(form => {
           this.loading.edit = false
           this.modals.isNewDisplayed = false
-          this.applySearchFromUrl()
+          this.applySearchFromUrl(false)
         })
         .catch(err => {
           console.error(err)
@@ -951,6 +956,9 @@ export default {
         if (this.isAssetEstimation) {
           headers.push(this.$t('main.estimation_short'))
         }
+        if (this.isAssetResolution) {
+          headers.push(this.$t('shots.fields.resolution'))
+        }
         this.assetValidationColumns.forEach(taskTypeId => {
           headers.push(this.taskTypeMap.get(taskTypeId).name)
           headers.push('Assignations')
@@ -974,7 +982,7 @@ export default {
         [fieldName]: value
       }
       await this.editAsset(data)
-      this.applySearchFromUrl()
+      this.applySearchFromUrl(false)
     },
 
     async onMetadataChanged({ entry, descriptor, value }) {
@@ -985,12 +993,12 @@ export default {
         }
       }
       await this.editAsset(data)
-      this.applySearchFromUrl()
+      this.applySearchFromUrl(false)
     },
 
     async onAssetChanged(asset) {
       await this.editAsset(asset)
-      this.applySearchFromUrl()
+      this.applySearchFromUrl(false)
     },
 
     reset() {
@@ -1004,6 +1012,7 @@ export default {
 
   watch: {
     currentProduction() {
+      this.setOptionalImportColumns()
       this.$refs['asset-search-field']?.setValue('')
       this.$store.commit('SET_ASSET_LIST_SCROLL_POSITION', 0)
       this.initialLoading = true

@@ -33,7 +33,6 @@
               @save="saveSearchQuery"
             />
             <combobox-production
-              v-if="isActiveTab('board')"
               class="flexrow-item production-field"
               :label="$t('main.production')"
               :production-list="productionList"
@@ -302,13 +301,13 @@ export default {
     },
 
     loggablePersonTasks() {
-      return this.displayedPersonTasks.filter(task => {
+      return this.sortedTasks.filter(task => {
         return this.taskTypeMap.get(task.task_type_id).allow_timelog
       })
     },
 
     loggableDoneTasks() {
-      return this.displayedPersonDoneTasks.filter(task => {
+      return this.sortedDoneTasks.filter(task => {
         return this.taskTypeMap.get(task.task_type_id).allow_timelog
       })
     },
@@ -326,18 +325,30 @@ export default {
     },
 
     sortedTasks() {
-      return this.sortTasks([...this.displayedPersonTasks])
+      let tasks = this.sortTasks([...this.displayedPersonTasks])
+      if (this.productionId) {
+        tasks = tasks.filter(task => task.project_id === this.productionId)
+      }
+      return tasks
     },
 
     sortedDoneTasks() {
-      return this.sortTasks([...this.displayedPersonDoneTasks])
+      let tasks = this.sortTasks([...this.displayedPersonDoneTasks])
+      if (this.productionId) {
+        tasks = tasks.filter(task => task.project_id === this.productionId)
+      }
+      return tasks
     },
 
     sortedAllTasks() {
-      return this.sortTasks([
+      let tasks = this.sortTasks([
         ...this.displayedPersonTasks,
         ...this.displayedPersonDoneTasks
       ])
+      if (this.productionId) {
+        tasks = tasks.filter(task => task.project_id === this.productionId)
+      }
+      return tasks
     },
 
     tasksStartDate() {
@@ -862,8 +873,8 @@ export default {
     productionId() {
       this.$router.push({
         query: {
-          productionId: this.productionId,
-          tab: this.activeTab
+          ...this.$route.query,
+          productionId: this.productionId
         }
       })
     },

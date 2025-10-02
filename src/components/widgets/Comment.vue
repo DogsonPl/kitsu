@@ -899,7 +899,10 @@ export default {
           this.showReply = false
           this.replyAttachments = []
         })
-        .catch(console.error)
+        .catch(error => {
+          console.error(error)
+          this.isReplyLoading = false
+        })
     },
 
     onDeleteReplyClicked(reply) {
@@ -916,7 +919,7 @@ export default {
       // @ for team, # for task type
       if (at !== option_at) return false
       // match at lower-case
-      return name.toLowerCase().indexOf(chunk.toLowerCase()) > -1
+      return name?.toLowerCase().indexOf(chunk.toLowerCase()) > -1
     },
 
     onAtTextChanged(input) {

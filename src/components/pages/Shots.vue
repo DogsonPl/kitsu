@@ -384,7 +384,8 @@ export default {
         'Nb Frames',
         'Frame In',
         'Frame Out',
-        'FPS'
+        'FPS',
+        'Resolution'
       ],
       genericColumns: [
         'Metadata column name (text value)',
@@ -448,11 +449,7 @@ export default {
   },
 
   mounted() {
-    if (this.isCurrentUserClient) {
-      this.$router.push({ name: 'not-found' })
-      return
-    }
-
+    this.setOptionalImportColumns()
     const finalize = () => {
       this.$nextTick(() => {
         // Needed to be sure the current production is set
@@ -510,6 +507,7 @@ export default {
       'isFps',
       'isLongShotList',
       'isMaxRetakes',
+      'isPaperProduction',
       'isResolution',
       'isShotDescription',
       'isShotEstimation',
@@ -613,6 +611,21 @@ export default {
       'uploadShotFile',
       'uploadEdlFile'
     ]),
+
+    setOptionalImportColumns() {
+      const columns = [
+        this.$t('shots.fields.description'),
+        this.$t('shots.fields.nb_frames'),
+        this.$t('shots.fields.frame_in'),
+        this.$t('shots.fields.frame_out'),
+        this.$t('shots.fields.fps'),
+        this.$t('shots.fields.resolution')
+      ]
+      if (this.isPaperProduction) {
+        columns.splice(1, 1)
+      }
+      this.optionalColumns = columns
+    },
 
     reloadEpisodeShotsIfNeeded() {
       if (
@@ -950,6 +963,9 @@ export default {
     },
 
     onSequenceClicked(sequenceName) {
+      if (sequenceName.includes(' ')) {
+        sequenceName = `"${sequenceName}"`
+      }
       this.searchField.setValue(`${this.shotSearchText} ${sequenceName}`)
       this.onSearchChange()
     },
@@ -1088,19 +1104,21 @@ export default {
       if (
         descriptor.field_name === 'frame_in' &&
         shot.data?.frame_out &&
-        parseInt(shot.data.frame_out) > parseInt(value)
+        parseInt(shot.data.frame_out) > parseInt(value) &&
+        !this.isPaperProduction
       ) {
         data.nb_frames = parseInt(shot.data.frame_out) - parseInt(value) + 1
       }
       if (
         descriptor.field_name === 'frame_out' &&
         shot.data?.frame_in &&
-        parseInt(shot.data.frame_in) < parseInt(value)
+        parseInt(shot.data.frame_in) < parseInt(value) &&
+        !this.isPaperProduction
       ) {
         data.nb_frames = parseInt(value) - parseInt(shot.data.frame_in) + 1
       }
       await this.editShot(data)
-      this.applySearchFromUrl()
+      this.applySearchFromUrl(false)
     },
 
     showEDLImportModal() {
@@ -1162,6 +1180,7 @@ export default {
     },
 
     currentProduction() {
+      this.setOptionalImportColumns()
       if (!this.initialLoading) {
         this.$refs['shot-search-field']?.setValue('')
         this.$store.commit('SET_SHOT_LIST_SCROLL_POSITION', 0)
