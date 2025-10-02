@@ -49,6 +49,7 @@
           :width="150"
           :options="previewFileOptions"
           v-model="previewFileId"
+          :disabled="isCurrentUserClient"
         />
       </div>
       <div v-else>
@@ -124,7 +125,8 @@ export default {
       'taskTypeMap',
       'taskStatusMap',
       'isCurrentUserManager',
-      'isCurrentUserSupervisor'
+      'isCurrentUserSupervisor',
+      'isCurrentUserClient'
     ]),
 
     dropArea() {
