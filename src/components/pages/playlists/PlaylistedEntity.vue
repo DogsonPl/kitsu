@@ -42,6 +42,7 @@
           :width="150"
           :options="taskTypeOptions"
           v-model="taskTypeId"
+          :disabled="isCurrentUserClient"
         />
         <combobox
           class="version-combo"
@@ -49,7 +50,6 @@
           :width="150"
           :options="previewFileOptions"
           v-model="previewFileId"
-          :disabled="isCurrentUserClient"
         />
       </div>
       <div v-else>
