@@ -2084,12 +2084,28 @@ export default {
       this.$emit('remove-extra-preview', this.currentPreview)
     },
 
+    updateFullscreenRevision(){
+      this.$nextTick(() => {
+        const selected = document.getElementsByClassName("preview-combo");
+
+        if (selected.length === 2) {
+          const from = selected[0].querySelector(".selected-line");
+          const to = selected[1].querySelector(".selected-line");
+
+          if (from && to) {
+            to.textContent = from.textContent;
+          }
+        }
+      });
+    },
+
     onPreviousClicked() {
       if (this.currentIndex > 1) {
         this.currentIndex--
       } else {
         this.currentIndex = this.previews.length
       }
+      this.updateFullscreenRevision()
     },
 
     onNextClicked() {
@@ -2098,6 +2114,7 @@ export default {
       } else {
         this.currentIndex = 1
       }
+      updateFullscreenRevision()
     },
 
     displayFirst() {
