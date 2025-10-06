@@ -2114,7 +2114,7 @@ export default {
       } else {
         this.currentIndex = 1
       }
-      updateFullscreenRevision()
+      this.updateFullscreenRevision()
     },
 
     displayFirst() {
