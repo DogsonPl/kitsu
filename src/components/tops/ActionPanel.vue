@@ -1019,7 +1019,7 @@ export default {
         this.isCurrentUserSupervisor && this.user.departments.length > 0
 
       return this.team.filter(person => {
-        if (!person?.is_bot) {
+        if (!person?.is_bot && person?.role != "client") {
           if (isSupervisorWithDepartments) {
             return (
               person.departments.length === 0 ||
