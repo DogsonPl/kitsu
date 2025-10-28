@@ -11,7 +11,7 @@
       <span
         class="description-shorten-text selectable"
         v-html="
-          renderMarkdown(shortenText(entry.description, 20), {
+          renderMarkdown(shortenText(entry.description, 5000), {
             allowedLinkTag: false
           })
         "

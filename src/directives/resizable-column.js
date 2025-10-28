@@ -11,7 +11,7 @@ export default {
           el.className += ' resizable'
         }
 
-        const nameThs = Array.from(el.getElementsByClassName('name'))
+        const nameThs = Array.from(el.querySelectorAll('th'))
         const metaThs = Array.from(
           el.getElementsByClassName('metadata-descriptor')
         )
