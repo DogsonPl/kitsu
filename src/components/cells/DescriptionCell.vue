@@ -11,7 +11,7 @@
       <span
         class="description-shorten-text selectable"
         v-html="
-          renderMarkdown(shortenText(entry.description, 5000), {
+          renderMarkdown(shortenText(entry.description, maxLength), {
             allowedLinkTag: false
           })
         "
@@ -49,7 +49,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
 import { renderMarkdown } from '@/lib/render'
 import stringHelpers from '@/lib/string'
 
@@ -60,7 +59,8 @@ export default {
     return {
       isEditing: false,
       isOpen: false,
-      tooltipPosition: { top: 0, left: 0 }
+      tooltipPosition: { top: 0, left: 0 },
+      maxLength: 20
     }
   },
 
@@ -92,10 +92,34 @@ export default {
     }
   },
 
+  mounted() {
+    this.observeResize()
+  },
+
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+    }
+  },
+
   methods: {
     renderMarkdown,
-
     shortenText: stringHelpers.shortenText,
+
+    observeResize() {
+      const el = this.$el
+      if (!el) return
+
+      this.resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          const width = entry.contentRect.width
+          this.maxLength = Math.floor(width / 7)
+          if (this.maxLength < 20) this.maxLength = 20
+        }
+      })
+
+      this.resizeObserver.observe(el)
+    },
 
     onClick(event) {
       if (
