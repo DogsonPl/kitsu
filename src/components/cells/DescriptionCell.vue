@@ -183,6 +183,8 @@ export default {
 .description-shorten-text {
   min-height: 30px;
   min-width: 100px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .tooltip {
