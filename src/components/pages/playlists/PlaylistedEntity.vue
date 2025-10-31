@@ -149,7 +149,8 @@ export default {
 
     previewFileOptions() {
       const previewFiles = this.entity.preview_files[this.taskTypeId] || []
-      return previewFiles.map(previewFile => ({
+      const previewFilesAccepted = previewFiles.filter((previewFile) => previewFile.validation_status != "Rejected")
+      return previewFilesAccepted.map(previewFile => ({
         label: `v${previewFile.revision}`,
         value: previewFile.id
       }))
@@ -190,6 +191,17 @@ export default {
         }
         if (!this.taskTypeId) {
           this.taskTypeId = taskTypeIds[0]
+        }
+
+        const previewFiles = this.entity.preview_files[this.taskTypeId]
+        if (previewFiles && previewFiles.length > 0) {
+          const validFiles = previewFiles
+            .filter(f => f.validation_status !== 'Rejected')
+            .sort((a, b) => b.revision - a.revision)
+
+          if (validFiles.length > 0) {
+            this.previewFileId = validFiles[0].id
+          }
         }
       }
     },
@@ -249,13 +261,17 @@ export default {
       // this task type.
       const previewFiles = this.entity.preview_files[this.taskTypeId]
       if (previewFiles && previewFiles.length > 0) {
-        const isPreviewFile = previewFiles.some(previewFile => {
-          return previewFile.id === this.entity.preview_file_id
-        })
-        if (isPreviewFile) {
-          this.previewFileId = this.entity.preview_file_id
-        } else {
-          this.previewFileId = previewFiles[0].id
+        const validFiles = previewFiles
+          .filter(f => f.validation_status !== 'Rejected')
+          .sort((a, b) => b.revision - a.revision)
+
+        if (validFiles.length > 0) {
+          const currentIsValid = validFiles.some(
+            f => f.id === this.entity.preview_file_id
+          )
+          this.previewFileId = currentIsValid
+            ? this.entity.preview_file_id
+            : validFiles[0].id
         }
       }
     },
