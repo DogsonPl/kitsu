@@ -180,6 +180,13 @@ export const annotationMixin = {
         })
       } else {
         this.fabricCanvas.add(activeObject)
+        activeObject.hasControls = true
+        activeObject.hasBorders = true
+        activeObject.lockScalingX = false
+        activeObject.lockScalingY = false
+        activeObject.selectable = true
+        this.fabricCanvas.setActiveObject(activeObject)
+        this.fabricCanvas.requestRenderAll()
       }
       if (persist) {
         this.$options.doneActionStack.push({ type: 'add', obj: activeObject })
@@ -667,11 +674,13 @@ export const annotationMixin = {
           ml: false,
           mr: false,
           bl: false,
-          br: false,
+          br: !this.isCurrentUserArtist,
           tl: false,
           tr: false,
-          mtr: false
+          mtr: !this.isCurrentUserArtist
         })
+        text.lockScalingX = false
+        text.lockScalingY = false
         this.$options.silentAnnnotation = true
         canvas.add(text)
         this.$options.silentAnnnotation = false
@@ -971,8 +980,8 @@ export const annotationMixin = {
      */
     stackAddAction({ target }) {
       this.$options.doneActionStack.push({ type: 'add', obj: target })
-      target.lockScalingX = true
-      target.lockScalingY = true
+      target.lockScalingX = false
+      target.lockScalingY = false
       target.rotation = true
     },
 
