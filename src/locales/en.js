@@ -236,7 +236,7 @@ export default {
     edited_by: 'Edited by {name}',
     empty_text: 'This comment is empty',
     edit_error: 'An error occurred while editing the comment. Please contact our support team.',
-    error: 'An error occurred while posting comment',
+    error: 'An error occurred while posting comment. The file can be up to 256MB',
     max_retakes_error: 'You cannot add retakes anymore on this task.',
     no_attachments: 'There are no attachments for this comment.',
     no_file_attached: 'No preview attached',
