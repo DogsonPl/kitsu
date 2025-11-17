@@ -635,14 +635,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dark .page {
-  background: $dark-grey-light;
-  height: 100%;
-  padding-bottom: 1em;
+.dark {
+  .page {
+    padding-bottom: 1em;
+  }
+
+  .table-body {
+    border: 1px solid $dark-grey;
+  }
+
+  .wrapper {
+    background: $dark-grey-2;
+  }
 }
 
-.dark .wrapper {
-  background: $dark-grey-2;
+.ready-for {
+  margin-top: 0em;
+  margin-bottom: 0em;
 }
 
 .main-column {
@@ -662,14 +671,14 @@ h2.subtitle {
 .page-header {
   margin-top: calc(50px + 2em);
   margin-bottom: 0.8em;
-  margin-left: 2em;
+  margin-left: 1em;
   margin-right: 1em;
-
   .entity-title {
     font-weight: 500;
   }
 }
-.shot-data {
+
+.asset-data {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -678,15 +687,23 @@ h2.subtitle {
   overflow: hidden;
 }
 
-.shot-casting {
+.asset-casting,
+.asset-casted-in,
+.concepts {
   overflow-y: auto;
 }
 
-.asset-link .thumbnail-picture {
+.thumbnail-picture {
   margin-bottom: 0.5em;
 }
 
-.asset-type {
+.sequence-shots {
+  margin-bottom: 3em;
+}
+
+.asset-type,
+.concept-type,
+.shot-sequence {
   text-transform: uppercase;
   font-size: 1.2em;
   color: var(--text);
@@ -694,49 +711,54 @@ h2.subtitle {
   margin-bottom: 0.4em;
 }
 
-.asset-list {
+.asset-list,
+.shot-list,
+.concept-list {
   color: var(--text);
   display: flex;
   flex-wrap: wrap;
 }
 
-.asset-link {
+.concept-list {
+  padding-bottom: 1em;
+  gap: 10px;
+}
+
+.asset-link,
+.shot-link {
   color: inherit;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
+  margin-right: 1em;
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 0.8em;
-
-  .entity-thumbnail.shared {
-    box-shadow: 0 0 3px 2px var(--shared-color);
-  }
-
-  .ready-for .no-link {
-    cursor: inherit;
-  }
 }
 
-.asset-link div {
+.asset-link div,
+.shot-link div {
   max-width: 100px;
 }
 
-.asset-link span {
+.asset-link span,
+.shot-link span {
   word-wrap: break-word;
+}
+
+.concept-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
 }
 
 .field-label {
   font-weight: bold;
-  width: 140px;
+  width: 120px;
 }
 
 .page-header {
   align-items: center;
-}
-
-.data-list {
-  max-width: 100%;
 }
 
 .back-link {
@@ -744,9 +766,10 @@ h2.subtitle {
 }
 
 .task-list {
-  width: 100%;
-  flex: none;
-  margin-bottom: 2em;
+  flex: 1;
+  margin-bottom: 3em;
+  min-width: 100%;
+  overflow: hidden;
 }
 
 .datatable-row {
@@ -754,9 +777,9 @@ h2.subtitle {
 }
 
 .schedule {
-  overflow: hidden;
   position: relative;
   height: 100%;
+  overflow: hidden;
 
   .timelien-wrapper,
   .timeline {
@@ -781,6 +804,11 @@ h2.subtitle {
   }
 }
 
+.entity-thumbnail {
+  margin-bottom: 0;
+  border-radius: 10px;
+}
+
 @media screen and (max-width: 768px) {
   .task-column {
     margin-bottom: 1em;
@@ -799,7 +827,6 @@ h2.subtitle {
 .tag-standby {
   background: $red;
   color: $white;
-  margin-left: 1em;
   cursor: default;
   text-transform: uppercase;
 }
@@ -818,31 +845,43 @@ h2.subtitle {
   overflow-y: auto;
 }
 
-.news-column {
-  max-height: 85%;
-}
-
 .infos {
-  flex: 1;
+  height: 100%;
   margin-top: 1em;
+  margin-bottom: 1em;
+  max-height: 100%;
   overflow-y: auto;
 
-  .entity-infos {
-    align-self: flex-start;
-    flex: 1;
+  .metadata-infos {
+    flex: unset;
+    overflow: auto;
   }
 }
 
-.entity-data {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  margin: 0 1em 0 1em;
-  max-height: 100%;
-  overflow: hidden;
+.entity-stats {
+  padding: 1em;
+  font-size: 1.2em;
+
+  .entry-label {
+    display: inline-block;
+    width: 120px;
+  }
 }
 
 .news-column {
   max-height: 85%;
+}
+
+.concept {
+  border: 5px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s linear;
+  &:hover {
+    border: 5px solid var(--background-selectable);
+  }
+}
+
+.selected {
+  border: 5px solid var(--background-selected);
 }
 </style>
