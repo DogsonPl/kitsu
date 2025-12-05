@@ -77,6 +77,7 @@ export const annotationMixin = {
 
   data() {
     return {
+      isEditingText: false,
       fabricCanvas: null,
       fabricCanvasComparison: null,
       lastAnnotationTime: '',
@@ -223,9 +224,20 @@ export const annotationMixin = {
       this.fabricCanvas.setActiveObject(fabricText)
       fabricText.enterEditing()
       fabricText.selectAll()
-      fabricText.hiddenTextarea.onblur = () => {
+      fabricText.on('editing:entered', () => {
+        this.isEditingText = true
+        fabricText.__lastSavedText = fabricText.text
+      })
+
+      fabricText.on('editing:exited', () => {
+        this.isEditingText = false
+
+        if (!fabricText.text || fabricText.text.trim() === '') {
+          fabricText.text = fabricText.__lastSavedText || ' '
+        }
+
         this.saveAnnotations()
-      }
+      })
     },
 
     /** @lends fabric.IText.prototype */
@@ -938,6 +950,7 @@ export const annotationMixin = {
      *   reference.
      */
     onObjectModified(event) {
+    if (this.isEditingText) return
       const movedObject = event.target
       if (!movedObject._objects) {
         this.addToUpdates(movedObject)
